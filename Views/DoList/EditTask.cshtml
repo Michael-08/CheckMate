@@ -1,0 +1,17 @@
+﻿@model Tasks
+
+
+<h2 class="my-4">Edit Task</h2>
+
+<form asp-controller="DoList" asp-action="EditTask" method="post">
+    <div class="form-group my-2">
+        <textarea asp-for="Body" class="form-control" name="AnsBody">@Model.Body</textarea>
+        <span asp-validation-for="Body" class="text-danger"></span>
+    </div>
+    <div class="form-group my-2">
+        <input type="date" asp-for="Deadline" class="form-control" name="deadline" value="@Model.Deadline.ToString("D")"></input>
+        <span asp-validation-for="Deadline" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="Id" name="Id"/>
+    <input type="submit" value="Save" class="btn btn-primary my-2" />
+</form>

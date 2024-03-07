@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        /* CSS for the layout */
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 0;
+            padding-top: 0;
+            background-color: #212529; /* Glossy white background */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #f8f9fa;
+            /* Glossy black text color */
+        }
+
+        .container {
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1, h3, p {
+            margin-bottom: 20px;
+            opacity: 0; /* Initially hide all elements */
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="header"></h1>
+        <h3 id="subtitle"></h3>
+        <p id="paragraph"></p>
+    </div>
+
+    <script>
+        // JavaScript for typing effect
+        const header = document.getElementById('header');
+        const subtitle = document.getElementById('subtitle');
+        const paragraph = document.getElementById('paragraph');
+
+        // Text to be typed
+        const headerText = "Welcome to CheckMate";
+        const subtitleText = "Let me simplify your Tasks!";
+        const paragraphText = "........................";
+
+        // Delay between each character (adjust as needed)
+        const typingSpeed = 50; // in milliseconds
+
+        // Function to simulate typing effect
+        function typeText(element, text, index) {
+            if (index < text.length) {
+                element.textContent += text.charAt(index);
+                setTimeout(function () {
+                    typeText(element, text, index + 1);
+                }, typingSpeed);
+            }
+        }
+
+        // Start typing each text
+        typeText(header, headerText, 0);
+        setTimeout(function () {
+            typeText(subtitle, subtitleText, 0);
+        }, headerText.length * typingSpeed);
+        setTimeout(function () {
+            typeText(paragraph, paragraphText, 0);
+        }, (headerText.length + subtitleText.length) * typingSpeed);
+    </script>
+</body>
+</html>

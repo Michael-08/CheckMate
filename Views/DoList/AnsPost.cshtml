@@ -1,0 +1,345 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ToDoList.Models.ViewModels.ListTask
+
+<style>
+    /* Reset some default styles */
+    body, h1, h2, h3, p, ul, li {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+    }
+
+    .container {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .post {
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #fff;
+    }
+
+    .post-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .post-body {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .post-timestamp {
+        font-size: 12px;
+        color: #666;
+        text-align: right;
+    }
+
+    .answer {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .answer-body {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .answer-timestamp {
+        font-size: 12px;
+        color: #888;
+        text-align: right;
+    }
+
+    .comment-toggle-btn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+        .comment-toggle-btn:hover {
+            background-color: #0056b3;
+        }
+
+    .comments {
+        margin-top: 10px;
+    }
+
+    .comment {
+        margin-top: 10px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+    }
+
+    .comment-timestamp {
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    .comment-form button {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+        .comment-form button:hover {
+            background-color: #0056b3;
+        }
+
+    .add-comment-form textarea {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    .add-comment-form button {
+        padding: 5px 10px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+        .add-comment-form button:hover {
+            background-color: #218838;
+        }
+
+</style>
+
+
+@foreach (var doList in Model.DoLists)
+{
+    <div class="post" style="background: rgb(99 100 103 / 50%);">
+        <h2 class="post-title"><i class="fa-solid fa-bars-staggered"></i> @doList.Title</h2>
+        <p class="post-body"><i class="fa-solid fa-receipt"></i>   @doList.Body</p>
+        <p class="post-timestamp">Posted on: @doList.TimeStamp.ToString("D")</p>
+        <div class="answers">
+            @foreach (var tasks in Model.Tasks)
+            {
+                <div class="answer my-2" style="background: rgb(222 223 228 / 50%)">
+                    <div style="max-width: 100%; overflow: hidden;">
+                        <p style="margin: 0; padding: 0; white-space: normal; word-wrap: break-word;"><i class="fa-solid fa-bars-progress"></i> @tasks.Body</p>
+                    </div>
+
+                    <div class="post-timestamp mx-4 my-4">
+                        <form asp-controller="DoList" asp-action="Checkbox" method="post">
+                            @if (@tasks.isCompleted == false)
+                            {
+                                <input type="hidden" name="taskId" value="@tasks.Id"/>
+                                <input type="hidden" name="doneOrNot" value="false"/>
+                                <input type="hidden" name="doListId" value="@doList.Id"/>
+                                <button type="submit" class="btn btn-primary btn-sm">Done</button>
+                            }
+                            else
+                            {
+                                <input type="hidden" name="taskId" value="@tasks.Id"/>
+                                <input type="hidden" name="doneOrNot" value="true"/>
+                                <input type="hidden" name="doListId" value="@doList.Id"/>
+                                <button type="submit" class="btn btn-primary btn-sm">Undo</button>
+                            }
+                        </form>
+                    </div>
+
+                    <p class="post-timestamp">
+                        Added on:
+                        @tasks.TimeStamp.ToString("D")
+                    </p>
+                    <p class="post-timestamp" style="color:red">
+                        Deadline:
+                        @(tasks.Deadline.ToString("D"))
+                    </p>
+
+
+                    <div class="comments" style="">
+                        @foreach (var subTask in Model.SubTasks.Where(c => c.AnsId == tasks.Id).Take(2))
+                        {
+                            <div class="comment">
+                                <p><i class="fa-solid fa-chess-knight"></i> @subTask.Body</p>
+                                <div class="comment-info" style="display:flex">
+                                    <div class="my-2" style="display:flex;">
+                                        @if (@Model.currUser.Id == subTask.AppUserId)
+                                        {
+                                            <button class="btn btn-outline-info edit-comment-btn btn-sm"><i class="fa-regular fa-pen-to-square"></i></button>
+                                            <form asp-controller="DoList" asp-action="DeleteSubTask" method="post">
+                                                <input type="hidden" name="doListId" value="@doList.Id"/>
+                                                <input type="hidden" name="subTaskId" value="@subTask.Id"/>
+                                                <button type="submit" class="btn btn-outline-danger mx-2 btn-sm"><i class="fa-solid fa-minus"></i></button>
+                                            </form>
+                                        }
+                                        <p class="comment-timestamp">Added on: @subTask.TimeStamp.ToString("D")</p>
+                                        <p class="comment-timestamp mx-2" style="color:red">Deadline: @subTask.Deadline.ToString("D")</p>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="edit-comment-view" style="display: none;">
+                                    <form asp-controller="DoList" asp-action="EditSubTask" method="post">
+                                        <input type="hidden" name="doListId" value="@doList.Id"/>
+                                        <input type="hidden" name="subTaskId" value="@subTask.Id"/>
+                                        <textarea name="commentText">@subTask.Body</textarea>
+                                        <input type="date" name="deadline"/>
+                                        <button type="submit" class="btn btn-outline-success btn-sm mx-2 mb-3">Save</button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        }
+                        <div id="RestComments" style="display:none">
+                            @{
+                                var AllSubTasks = Model.SubTasks.Where(c => c.AnsId == tasks.Id).ToArray();
+                            }
+                            @for (var i = 2; i < Model.SubTasks.Where(c => c.AnsId == tasks.Id).Count(); i++)
+                            {
+                                var subTask = AllSubTasks[i];
+                                <div class="comment">
+                                    <p>@subTask.Body</p>
+                                    <div class="comment-info" style="display:flex">
+                                        <div class="my-2" style="display:flex;">
+                                            @if (@Model.currUser.Id == subTask.AppUserId)
+                                            {
+
+                                                <button class="btn btn-outline-info edit-comment-btn btn-sm"><i class="fa-regular fa-pen-to-square"></i></button>
+                                                <form asp-controller="DoList" asp-action="DeleteSubTask" method="post">
+                                                    <input type="hidden" name="doListId" value="@doList.Id"/>
+                                                    <input type="hidden" name="subTaskId" value="@subTask.Id"/>
+                                                    <button type="submit" class="btn btn-outline-danger mx-2 btn-sm"><i class="fa-solid fa-minus"></i></button>
+                                                </form>
+                                            }
+                                            <p class="comment-timestamp">Added on: @subTask.TimeStamp.ToString("D") by @Model.AppUsers.FirstOrDefault(u => u.Id == subTask.AppUserId).UserName</p>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="edit-comment-view" style="display: none;">
+                                        <form asp-controller="DoList" asp-action="" method="post">
+                                            <input type="hidden" name="doListId" value="@doList.Id"/>
+                                            <input type="hidden" name="subTaskId" value="@subTask.Id"/>
+                                            <textarea name="commentText">@subTask.Body</textarea>
+                                            <button type="submit" class="btn btn-outline-success btn-sm mx-2 mb-3">Save</button>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                        <button class="my-2 comment-toggle-btn btn btn-outline-primary btn-sm showMoreComments"><i class="fa-solid fa-caret-down InsideShowMore"></i></button>
+
+
+                    </div>
+
+                    <form asp-controller="DoList" asp-action="AddSubTask" method="post">
+                        <input type="hidden" name="taskId" value="@tasks.Id"/>
+                        <input type="hidden" name="doListId" value="@doList.Id"/>
+                        <input type="text" name="commentText" placeholder="Add a Sub-Task"/>
+                        <input type="date" name="deadline"/>
+                        <button type="submit" class="btn btn-primary btn-sm mx-2"><i class="fa-regular fa-keyboard"></i></button>
+                    </form>
+
+
+                </div>
+
+
+                <div style="display:flex">
+                    @if (@Model.currUser.Id == tasks.AppUserId)
+                    {
+
+                        <form asp-controller="DoList" asp-action="EditTask" method="get">
+                            <input type="hidden" name="taskId" value="@tasks.Id"/>
+                            <button type="submit" class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-pen-to-square"></i></button>
+                        </form>
+                        <form asp-controller="DoList" asp-action="DeleteTask" method="post">
+                            <input type="hidden" name="doListId" value="@doList.Id"/>
+                            <input type="hidden" name="taskId" value="@tasks.Id"/>
+                            <button type="submit" class="btn btn-outline-danger btn-sm mx-2"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+        <form asp-controller="DoList" asp-action="AddAns" method="post">
+            <input type="hidden" name="postId" value="@doList.Id" />
+            <input type="text" name="answerText" class="mt-3" placeholder="Task description..." />
+            <input type="date" name="deadline" class="mt-3" />
+            <button type="submit" class="btn btn-success btn-sm my-2"><i class="fa-solid fa-plus"></i></button>
+        </form>
+    </div>
+
+
+    <div style="display:flex">
+        @if (@Model.currUser.Id == doList.AppUserId)
+        {
+
+            <form asp-controller="DoList" asp-action="UpdateDoList" method="get">
+                <input type="hidden" name="doListId" value="@doList.Id" />
+                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </form>
+            <form asp-controller="DoList" asp-action="DeleteDoList" method="post">
+                <input type="hidden" name="doListId" value="@doList.Id" />
+                <button type="submit" class="btn btn-danger btn-sm mx-2">Delete</button>
+            </form>
+        }
+    </div>
+}
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.querySelectorAll(".showMoreComments").forEach(function (showMoreBtn) {
+            showMoreBtn.addEventListener("click", function () {
+                var btn = this.parentElement.querySelectorAll("#RestComments")[0];
+                var btnView = this.parentElement.querySelectorAll(".InsideShowMore")[0];
+                if (btn.style.display == "none") {
+                    btn.style.display = "block";
+                    btnView.classList.remove("fa-regular");
+                    btnView.classList.remove("fa-comments");
+                    btnView.innerHTML = " Less";
+                    btnView.style.fontSize = "x-small";
+                } else {
+                    btn.style.display = "none";
+                    btnView.classList.add("fa-regular");
+                    btnView.classList.add("fa-comments");
+                    btnView.innerHTML = "";
+                }
+            });
+        });
+
+        document.querySelectorAll(".edit-comment-btn").forEach(function (button) {
+            button.addEventListener("click", function () {
+                var editView = this.parentElement.parentElement.nextElementSibling;
+                editView.style.display = (editView.style.display === "block") ? "none" : "block";
+            });
+        });
+
+
+    </script>
+
+
+}
