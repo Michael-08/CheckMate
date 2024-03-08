@@ -96,7 +96,8 @@
     </div>
     <div class="form-group">
         <label for="Deadline">Deadline:</label>
-        <input type="date" asp-for="Deadline" class="form-control" id="Deadline" name="Deadline" rows="4" required/>
+        <input type="date" asp-for="Deadline" class="form-control" id="Deadline" name="Deadline" rows="4" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+
     </div>
     <div class="form-group">
         <label>Add Collaborators:</label>

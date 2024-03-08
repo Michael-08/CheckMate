@@ -239,6 +239,9 @@ namespace ToDoList.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Collaborators")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly>("Deadline")
                         .HasColumnType("date");
 

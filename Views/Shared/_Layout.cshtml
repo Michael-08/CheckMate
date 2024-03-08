@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CheckMate</title>
+    <title>@ViewData["Title"] CheckMate</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
@@ -37,7 +37,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="fa-solid fa-house"></i> Home
                                 <span class="visually-hidden">(current)</span>
                             </a>
@@ -47,10 +47,20 @@
                                 <i class="fa-solid fa-list-check"></i> What To Do?
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="DoList" asp-action="Calendar">
+                                <i class="fa-solid fa-calendar-days"></i> Calendar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="DoList" asp-action="Shared">
+                                <i class="fa-brands fa-slideshare"></i> Shared
+                            </a>
+                        </li>
                     </ul>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <form class="d-flex my-2 my-lg-0" asp-action="" asp-controller="" method="get">
+                        <form class="d-flex my-2 my-lg-0" asp-action="Index" asp-controller="Search" method="get">
                             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="searchString" data-bs-theme="light">
                             <button class="btn btn-dark btn-sm" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
                         </form>
@@ -73,6 +83,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://kit.fontawesome.com/1cdfaf5f64.js" crossorigin="anonymous"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

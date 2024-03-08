@@ -26,13 +26,37 @@ namespace ToDoList.Controllers
             var id = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             ListTask listTask = new ListTask();
+
             listTask.DoLists = _unitOfWork.DoLists.GetAll(u => u.AppUserId == id).ToList();
+
             listTask.Tasks = (List<Tasks>)(_unitOfWork.Tasks.GetAll());
             listTask.AppUsers = (List<AppUser>)_unitOfWork.AppUsers.GetAll();
 
             listTask.DoLists = listTask.DoLists.OrderBy(p => p.Deadline).ToList();
             listTask.SubTasks = listTask.SubTasks.OrderBy(p => p.Deadline).ToList();
             listTask.Tasks = listTask.Tasks.OrderBy(p=>p.Deadline).ToList();
+
+            return View(listTask);
+        }
+
+        public IActionResult Shared()
+        {
+
+            var claims = (ClaimsIdentity)User.Identity;
+            var id = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ListTask listTask = new ListTask();
+
+            listTask.DoLists = _unitOfWork.DoLists
+                .GetAll(u => (u.Collaborators != null && u.Collaborators.Contains(id)))
+                .ToList();
+
+            listTask.Tasks = (List<Tasks>)(_unitOfWork.Tasks.GetAll());
+            listTask.AppUsers = (List<AppUser>)_unitOfWork.AppUsers.GetAll();
+
+            listTask.DoLists = listTask.DoLists.OrderBy(p => p.Deadline).ToList();
+            listTask.SubTasks = listTask.SubTasks.OrderBy(p => p.Deadline).ToList();
+            listTask.Tasks = listTask.Tasks.OrderBy(p => p.Deadline).ToList();
 
             return View(listTask);
         }
@@ -47,7 +71,7 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateDoListPost(DoList doList)
+        public IActionResult CreateDoListPost(DoList doList, string collaborators)
         {
             var claims = (ClaimsIdentity)User.Identity;
             var id = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -56,7 +80,26 @@ namespace ToDoList.Controllers
             doList.TimeStamp = DateOnly.FromDateTime(DateTime.Now);
 
             bool isPresent = _unitOfWork.DoLists.Get(u => u.Id == doList.Id) != null;
-            var curr_post = _unitOfWork.DoLists.Get(u => u.Id == doList.Id);
+
+            // Check if collaborators is not null before processing
+            if (!string.IsNullOrEmpty(collaborators))
+            {
+                string[] emailArray = collaborators.Split(',').Select(e => e.Trim().ToUpper()).ToArray();
+
+                foreach (var email in emailArray)
+                {
+                    AppUser user = _unitOfWork.AppUsers.Get(u => u.NormalizedUserName == email);
+                    if (user != null)
+                    {
+                        var userId = user.Id;
+                        doList.Collaborators.Add(userId);
+
+                        //["abc@gmail.com","2c06d6a9-a44d-40f1-96e6-9cfb61a6eeef"]
+                        //["abc@gmail.com,yash@gmail.com","2c06d6a9-a44d-40f1-96e6-9cfb61a6eeef","34bc944b-8492-4bb0-9320-aa8319ef0a1c"]
+                    }
+                }
+            }
+
 
             if (!isPresent)
             {
@@ -68,8 +111,8 @@ namespace ToDoList.Controllers
             }
             _unitOfWork.Save();
             return RedirectToAction("Index");
-
         }
+
         public IActionResult UpdateDoList(int doListId)
         {
             var claims = (ClaimsIdentity)User.Identity;
@@ -258,6 +301,38 @@ namespace ToDoList.Controllers
             _unitOfWork.Save();
             return RedirectToAction("AnsPost", new { id = doListId });
         }
+
+
+        public IActionResult Calendar()
+        {
+            var claims = (ClaimsIdentity)User.Identity;
+            var id = claims.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ListTask listTask = new ListTask();
+            listTask.DoLists = _unitOfWork.DoLists
+                .GetAll(u => u.AppUserId == id || (u.Collaborators != null && u.Collaborators.Contains(id)))
+                .ToList();
+            listTask.Tasks = (List<Tasks>)_unitOfWork.Tasks.GetAll();
+            listTask.SubTasks = (List<SubTask>)_unitOfWork.SubTasks.GetAll();
+
+            // Get list IDs
+            var listIds = listTask.DoLists.Select(list => list.Id).ToList();
+
+            // Remove tasks that don't belong to any list
+            listTask.Tasks.RemoveAll(task => !listIds.Contains(task.PostId));
+
+            // Remove subtasks that don't belong to any task
+            listTask.SubTasks.RemoveAll(subTask => !listIds.Contains(subTask.AnsId));
+
+            listTask.AppUsers = (List<AppUser>)_unitOfWork.AppUsers.GetAll();
+
+            listTask.DoLists = listTask.DoLists.OrderBy(p => p.Deadline).ToList();
+            listTask.SubTasks = listTask.SubTasks.OrderBy(p => p.Deadline).ToList();
+            listTask.Tasks = listTask.Tasks.OrderBy(p => p.Deadline).ToList();
+
+            return View(listTask);
+        }
+
 
     }
 }

@@ -1,0 +1,44 @@
+﻿@model ToDoList.Models.ViewModels.ListTask
+
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: [
+                    @foreach(var task in Model.Tasks)
+                    {
+                        <text>{
+                            title: '@task.Body',
+                            start: '@task.Deadline.ToString("yyyy-MM-dd")'
+                        },</text>
+                    }
+                    @foreach (var list in Model.DoLists)
+                    {
+                        <text>{
+                            title: '@list.Title',
+                            start: '@list.Deadline.ToString("yyyy-MM-dd")'
+                        }, </text>
+                    }
+                    @foreach (var subTask in Model.SubTasks)
+                    {
+                        <text>{
+                            title: '@subTask.Body',
+                            start: '@subTask.Deadline.ToString("yyyy-MM-dd")'
+                        }, </text>
+                    }
+                ]
+            });
+            calendar.render();
+        });
+    </script>
+</head>
+<body>
+<div id='calendar'></div>
+</body>
+</html>

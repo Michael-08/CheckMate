@@ -292,3 +292,4 @@ D:\C#\ToDoList\bin\Debug\net8.0\Microsoft.AspNetCore.Components.QuickGrid.Entity
 D:\C#\ToDoList\bin\Debug\net8.0\Microsoft.AspNetCore.Components.Web.dll
 D:\C#\ToDoList\bin\Debug\net8.0\Microsoft.AspNetCore.Metadata.dll
 D:\C#\ToDoList\bin\Debug\net8.0\Microsoft.JSInterop.dll
+D:\C#\ToDoList\obj\Debug\net8.0\ToDoList.sourcelink.json

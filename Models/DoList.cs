@@ -18,8 +18,7 @@ namespace ToDoList.Models
         public string Title { get; set; }
         [Required]
         public string Body { get; set; }
-
-        //public List<string> Collaborators { get; set; }
+        public List<string>? Collaborators { get; set; }
         public bool isCompleted { get; set; } = false;
     }
 }

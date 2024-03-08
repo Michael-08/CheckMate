@@ -1,0 +1,52 @@
+﻿@model List<Tuple<DoList, int>>
+
+@{
+    ViewData["Title"] = "Lists";
+}
+
+<h1><i class="fa-solid fa-quote-left"></i> Lists</h1>
+
+@if (Model.Count == 0)
+{
+    <p>No results found.</p>
+}
+else
+{
+    @foreach (var tuple in Model)
+    {
+        var post = tuple.Item1;
+
+        <div class="post">
+            <h2><a href="@Url.Action("AnsPost", "DoList", new { id = post.Id })">@post.Title</a></h2>
+
+            <p>@(post.Body.Length > 100 ? post.Body.Substring(0, 100) + "..." : post.Body)</p>
+        </div>
+    }
+}
+
+<style>
+    .post {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .tags {
+        margin-top: 5px;
+    }
+
+    .tag {
+        display: inline-block;
+        background-color: #f5f5f5;
+        color: #333;
+        padding: 2px 5px;
+        margin-right: 5px;
+        border-radius: 3px;
+    }
+
+    .tag-count {
+        font-style: italic;
+        color: #888;
+        margin-top: 5px;
+    }
+</style>

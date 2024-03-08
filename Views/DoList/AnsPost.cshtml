@@ -16,7 +16,7 @@
     .container {
         width: 80%;
         margin: 0 auto;
-        padding: 20px;
+        padding: 0px;
     }
 
     .post {
@@ -202,7 +202,7 @@
                                         <input type="hidden" name="doListId" value="@doList.Id"/>
                                         <input type="hidden" name="subTaskId" value="@subTask.Id"/>
                                         <textarea name="commentText">@subTask.Body</textarea>
-                                        <input type="date" name="deadline"/>
+                                        <input type="date" name="deadline" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                                         <button type="submit" class="btn btn-outline-success btn-sm mx-2 mb-3">Save</button>
                                     </form>
                                 </div>
@@ -248,7 +248,7 @@
                                 </div>
                             }
                         </div>
-                        <button class="my-2 comment-toggle-btn btn btn-outline-primary btn-sm showMoreComments"><i class="fa-solid fa-caret-down InsideShowMore"></i></button>
+                        <button class="my-2 btn btn-outline-primary btn-sm showMoreComments"><i class="fa-solid fa-caret-down InsideShowMore"></i></button>
 
 
                     </div>
@@ -257,7 +257,7 @@
                         <input type="hidden" name="taskId" value="@tasks.Id"/>
                         <input type="hidden" name="doListId" value="@doList.Id"/>
                         <input type="text" name="commentText" placeholder="Add a Sub-Task"/>
-                        <input type="date" name="deadline"/>
+                        <input type="date" name="deadline" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         <button type="submit" class="btn btn-primary btn-sm mx-2"><i class="fa-regular fa-keyboard"></i></button>
                     </form>
 
@@ -285,7 +285,7 @@
         <form asp-controller="DoList" asp-action="AddAns" method="post">
             <input type="hidden" name="postId" value="@doList.Id" />
             <input type="text" name="answerText" class="mt-3" placeholder="Task description..." />
-            <input type="date" name="deadline" class="mt-3" />
+            <input type="date" name="deadline" class="mt-3" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
             <button type="submit" class="btn btn-success btn-sm my-2"><i class="fa-solid fa-plus"></i></button>
         </form>
     </div>
